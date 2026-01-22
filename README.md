@@ -8,3 +8,5 @@
 
 If you prefer to pay for the parking do not pass the parking code parameter in.
 `npm run start "2026-01-25" "email" "password"`
+
+Note: It may be necessary to turn off the sleep mode on your computer while waiting for a reservation to open up
