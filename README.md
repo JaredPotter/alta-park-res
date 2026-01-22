@@ -1,3 +1,5 @@
+A node.js program to that utilizes Puppeteer and a debug-mode instance of chrome to automatically wait for a parking reservation at Alta to become available. Once available it will automatically make the reservation.
+
 1. Install nvm
 
 2. Run `nvm install`
