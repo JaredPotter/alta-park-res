@@ -259,7 +259,7 @@ async function checkParkingAvailability(page, resortBaseUrl, targetDate, parking
             }
 
             console.log('refreshing page...');
-            await sleep(5000);
+            await sleep(10000);
         }
 
     } catch (error) {

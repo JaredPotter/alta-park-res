@@ -73,6 +73,7 @@ async function login(page, resortBaseUrl, username, password, smsCode = null) {
     const loginUrl = resortBaseUrl + '/login';
     await page.goto(loginUrl, {
         waitUntil: 'networkidle0',
+        timeout: 10000000
     });
 
     const currentPageUrl = await page.url();

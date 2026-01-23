@@ -28,9 +28,17 @@ function setupRateLimitDetection(page, browser, onRateLimited) {
         // Check if it's a rate limit failure
         if (failure && (failure.errorText === 'net::ERR_FAILED')) {
           rateLimited = true;
-          console.log('❌ RATE LIMITED detected via request failure! Closing process.');
+          console.log('❌ RATE LIMITED detected via request failure! Waiting 5 minutes before retrying...');
 
-          // Call the callback to handle cleanup
+          // Wait 5 minutes before retrying
+          const waitMinutes = 5;
+          console.log(`⏳ Waiting ${waitMinutes} minutes...`);
+          await new Promise(resolve => setTimeout(resolve, waitMinutes * 60 * 1000));
+          console.log('✅ Wait complete. Retrying...');
+
+          rateLimited = false;
+
+          // Call the callback to retry
           if (onRateLimited) {
             onRateLimited();
           }
