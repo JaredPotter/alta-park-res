@@ -260,7 +260,8 @@ async function checkParkingAvailability(page, resortBaseUrl, targetDate, parking
                 break;
             }
 
-            console.log('refreshing page...');
+            const currentTime = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+            console.log(`refreshing page... [${currentTime}]`);
             await sleep(10000);
         }
 

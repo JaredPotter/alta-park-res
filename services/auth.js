@@ -1,4 +1,8 @@
 const config = require('../config');
+const fs = require('fs');
+const path = require('path');
+
+const COOKIES_PATH = path.join(__dirname, '..', 'cookies.json');
 
 /**
  * Handle SMS verification if the page navigates to SMS verify page
@@ -109,10 +113,29 @@ async function login(page, resortBaseUrl, username, password, smsCode = null) {
         }
 
         console.log('Successfully logged in');
+        
+        // Save cookies after successful login
+        await saveCookies(page);
+    }
+}
+
+/**
+ * Save cookies from the page to a local file
+ * @param {Page} page - Puppeteer page instance
+ */
+async function saveCookies(page) {
+    try {
+        const cookies = await page.cookies();
+        fs.writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
+        console.log(`Cookies saved to ${COOKIES_PATH}`);
+    } catch (error) {
+        console.error('Error saving cookies:', error.message);
     }
 }
 
 module.exports = {
     login,
-    handleSmsVerification
+    handleSmsVerification,
+    saveCookies,
+    COOKIES_PATH
 };
