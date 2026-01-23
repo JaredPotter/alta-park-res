@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { sleep } = require('../utils/helpers');
 const { sendTextMessage } = require('./notification');
+const { saveLocalStorage } = require('./auth');
 
 /**
  * Make parking reservation for a specific date
@@ -238,6 +239,9 @@ async function checkParkingAvailability(page, resortBaseUrl, targetDate, parking
                         timeout: 10000000
                     });
                 }
+
+                // Save localStorage after successfully loading select-parking page
+                await saveLocalStorage(page);
 
                 // Check if the date is available
                 const isAvailable = await checkDateAvailability(page, formattedDate, dateSelector, availableBackgroundColor);

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const COOKIES_PATH = path.join(__dirname, '..', 'cookies.json');
+const LOCALSTORAGE_PATH = path.join(__dirname, '..', 'localstorage.json');
 
 /**
  * Handle SMS verification if the page navigates to SMS verify page
@@ -74,6 +75,16 @@ async function handleSmsVerification(page, smsCode = null) {
  * @param {string} smsCode - Optional SMS verification code
  */
 async function login(page, resortBaseUrl, username, password, smsCode = null) {
+    // First navigate to base URL to set localStorage (localStorage is domain-specific)
+    await page.goto(resortBaseUrl, {
+        waitUntil: 'networkidle0',
+        timeout: 10000000
+    });
+
+    // Load saved localStorage before going to login
+    await loadLocalStorage(page);
+
+    // Now navigate to login page
     const loginUrl = resortBaseUrl + '/login';
     await page.goto(loginUrl, {
         waitUntil: 'networkidle0',
@@ -133,9 +144,58 @@ async function saveCookies(page) {
     }
 }
 
+/**
+ * Save localStorage from the page to a local file
+ * @param {Page} page - Puppeteer page instance
+ */
+async function saveLocalStorage(page) {
+    try {
+        const localStorage = await page.evaluate(() => {
+            const data = {};
+            for (let i = 0; i < window.localStorage.length; i++) {
+                const key = window.localStorage.key(i);
+                data[key] = window.localStorage.getItem(key);
+            }
+            return data;
+        });
+        fs.writeFileSync(LOCALSTORAGE_PATH, JSON.stringify(localStorage, null, 2));
+        console.log(`LocalStorage saved to ${LOCALSTORAGE_PATH}`);
+    } catch (error) {
+        console.error('Error saving localStorage:', error.message);
+    }
+}
+
+/**
+ * Load localStorage from a local file into the page
+ * @param {Page} page - Puppeteer page instance
+ */
+async function loadLocalStorage(page) {
+    try {
+        if (!fs.existsSync(LOCALSTORAGE_PATH)) {
+            console.log('No saved localStorage found, skipping load');
+            return;
+        }
+
+        const data = JSON.parse(fs.readFileSync(LOCALSTORAGE_PATH, 'utf8'));
+        
+        await page.evaluate((localStorageData) => {
+            for (const [key, value] of Object.entries(localStorageData)) {
+                window.localStorage.setItem(key, value);
+            }
+        }, data);
+
+        console.log(`LocalStorage loaded from ${LOCALSTORAGE_PATH}`);
+    } catch (error) {
+        console.error('Error loading localStorage:', error.message);
+    }
+}
+
 module.exports = {
     login,
     handleSmsVerification,
     saveCookies,
-    COOKIES_PATH
+    saveLocalStorage,
+    loadLocalStorage,
+    COOKIES_PATH,
+    LOCALSTORAGE_PATH
 };
