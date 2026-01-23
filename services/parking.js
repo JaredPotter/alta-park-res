@@ -205,6 +205,7 @@ async function checkParkingAvailability(page, resortBaseUrl, targetDate, parking
                     const parkingCodesUrl = resortBaseUrl + '/parking-codes';
                     await page.goto(parkingCodesUrl, {
                         waitUntil: 'networkidle0',
+                        timeout: 10000000
                     });
 
                     // Use page.evaluate() to find the button in one go to avoid detached nodes
@@ -234,6 +235,7 @@ async function checkParkingAvailability(page, resortBaseUrl, targetDate, parking
                     const selectParkingUrl = resortBaseUrl + '/select-parking';
                     await page.goto(selectParkingUrl, {
                         waitUntil: 'networkidle0',
+                        timeout: 10000000
                     });
                 }
 
